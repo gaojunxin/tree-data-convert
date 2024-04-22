@@ -3,6 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "author": {
+    "name": "gaojunxin",
+    "url": "https://github.com/gaojunxin",
+    "homepage": "https://www.gaojunxin.cn",
+    "email": "gjx.xin@qq.com"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
