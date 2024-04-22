@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "tree-data-convert"
+version = "0.1.0"
+description = "树形结构转换器，菜单树从excel导入数据库"
+authors = ["gaojunxin <gjx.xin@qq.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+openpyxl = "^3.1.2"
+flask = "^3.0.3"
+flask-socketio = "^5.3.6"
+flask-cors = "^4.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
