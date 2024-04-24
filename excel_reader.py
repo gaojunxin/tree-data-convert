@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 import os
+import json
 
 from openpyxl import load_workbook
 import logging
@@ -42,6 +43,23 @@ class TreeNode:
 
     def __str__(self):  
         return f"TreeNode(id={self.id}, title={self.title}, level={self.level}, parent_id={self.parent_id})" 
+    
+class TreeNodeEncoder(json.JSONEncoder):
+
+    def default(self, obj):
+        """
+        只要检查到了是TreeNode类型的数据就把它转为dict类型
+        :param obj:
+        :return:
+        """
+        if isinstance(obj, TreeNode):
+            return {
+                "id": obj.id,
+                "title": obj.title,
+                "level": obj.level,
+                "parentId": obj.parent_id
+            }
+        return json.JSONEncoder.default(self, obj)
 
 logging.basicConfig(level=logging.INFO)
 
@@ -90,7 +108,7 @@ def buildTreeDataFromExcel(excel_config_definitions):
             node_list.append(node)
             logging.info(node)
         row_num = row_num + 1
-    
+    print(json.dumps(root_node_list, cls=TreeNodeEncoder))
 
 if __name__ == "__main__":
     buildTreeDataFromExcel(excel_config_definitions)

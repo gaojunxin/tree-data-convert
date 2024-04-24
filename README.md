@@ -21,7 +21,7 @@ poetry install
 运行后端服务
 
 ```
-poetry run python aoo.py
+poetry run python app.py
 
 ```
 
