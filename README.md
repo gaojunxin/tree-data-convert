@@ -6,6 +6,10 @@
 
 因为工作中这种场景比较多，所以想单独拿出来做一个比较通用的工具。
 
+## 功能截图
+
+![image.png](http://image.gaojunxin.cn/i/2024/04/25/662a28aeb7d9b.png)
+
 ## 开始
 
 安装poetry
