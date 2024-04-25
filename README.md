@@ -43,7 +43,6 @@ pnpm dev
 
 目前还在开发中，逐步完善。
 
-![image.png](http://image.gaojunxin.cn/i/2024/04/22/66261fa029746.png)
 
 ## 联系我
 
