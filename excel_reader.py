@@ -6,6 +6,7 @@ import json
 from openpyxl import load_workbook
 import logging
 import yaml
+import uuid
 
 class TreeNode(dict):  
     """
@@ -114,6 +115,8 @@ class TreeDataExcelReader:
                 node['path'] = node['id']
             if node['menu_type'] is None or node['menu_type'] == "":
                 node['menu_type'] = "M"
+            if node['menu_type'] == 'C' and (node['name'] is None or node['name'] == ""):
+                node['name'] = uuid.uuid4().__str__() 
             if node['title']:
                 self.node_list.append(node)
                 self.logger.info(node)
