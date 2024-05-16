@@ -9,6 +9,7 @@ import threading
 import logging
 from flask_cors import CORS
 from excel_reader import TreeDataExcelReader
+import yaml
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="http://localhost:5173")
@@ -54,28 +55,12 @@ def handle_connect():
 def run_script_route():
     # 在新线程中执行脚本
     # threading.Thread(target=run_script).start()
-    excel_config_definitions = {
-    # 文件路径
-    "excel_file_path": "demo.xlsx",
-    # sheet名称
-    "sheet_name": "菜单结构",
-    # 名称所在行
-    "name_row": 1,
-    # 数据起始行
-    "data_row": 2,
-    # 名称起始列
-    "name_start": 0,
-    # 名称结束列
-    "name_end": 6,
-    # 生成的起始id
-    "generate_start_id": 8000,
-    # 扩展信息起始列
-    "extension_start": 7,
-    # 扩展信息结束列
-    "extension_end": 10,
-}
+
+    with open('config.yaml', 'r') as file:
+        config = yaml.safe_load(file)
+    excel_config = config['excel_config']
     excelReader = TreeDataExcelReader(logger)
-    excelReader.buildTreeDataFromExcel(excel_config_definitions)
+    excelReader.buildTreeDataFromExcel(excel_config)
     result = json.dumps([child.__json__() for child in excelReader.root_node_list], ensure_ascii=False, indent=4)
     return result
 

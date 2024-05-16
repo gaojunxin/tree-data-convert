@@ -1,0 +1,60 @@
+# 数据库配置
+database:
+  host: 192.168.0.2
+  port: 54321
+  user: admin
+  password: 123456
+  dbname: develop
+
+# 日志配置
+logging:
+  level: info
+  file: app.log
+  max_size: 10MB
+  backup_count: 5
+
+# 应用特有配置
+app_settings:
+  timeout_seconds: 30
+  max_connections: 100
+  feature_flag: enabled
+
+# Excel配置定义文件
+# 用于指示如何读取和解析Excel数据，特别是针对"菜单结构"的处理
+excel_config:
+  # 模式名
+  schema_name : xy_cloud1 
+  # 菜单表名
+  table_name : sys_menu 
+  # Excel文件的完整路径
+  excel_file_path: demo.xlsx
+  # 需要读取的工作表名称
+  sheet_name: 菜单结构
+  # Excel中列标题所在的行号
+  name_row: 1
+  # 数据记录开始的行号
+  data_row: 2
+  # 列标题开始的列索引
+  name_start: 0
+  # 列标题结束的列索引
+  name_end: 7
+  # 自动生成ID的起始值
+  generate_start_id: 8000
+  # 列数据与字段名的映射关系
+  col_mapping:
+    # 导航路径
+    path: 8
+    # 组件名称或路径
+    component: 9
+    # 菜单项名称
+    name: 10
+    # 参数路径（似乎与path重复，需确认用途）
+    param_path: 8
+    # 是否隐藏菜单项
+    hideMenu: 11
+    # 权限标识
+    perms: 12
+    # 菜单类型
+    menu_type: 13
+    # 排序顺序
+    # sort: 10

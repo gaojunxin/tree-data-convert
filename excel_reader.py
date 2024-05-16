@@ -5,30 +5,9 @@ import json
 
 from openpyxl import load_workbook
 import logging
+import yaml
 
-# 定义 Excel数据表 描述信息
-excel_config_definitions = {
-    # 文件路径
-    "excel_file_path": "demo.xlsx",
-    # sheet名称
-    "sheet_name": "菜单结构",
-    # 名称所在行
-    "name_row": 1,
-    # 数据起始行
-    "data_row": 2,
-    # 名称起始列
-    "name_start": 0,
-    # 名称结束列
-    "name_end": 6,
-    # 生成的起始id
-    "generate_start_id": 8000,
-    # 扩展信息起始列
-    "extension_start": 7,
-    # 扩展信息结束列
-    "extension_end": 10,
-}
-
-class TreeNode:  
+class TreeNode(dict):  
     """
         初始化一个树节点对象实例。
 
@@ -42,29 +21,39 @@ class TreeNode:
         属性:
         children: 一个空列表，用于存储该节点的子节点。
     """
-    def __init__(self, id, title, level, parent_id, path ):  
-        self.id = id
-        self.title = title  
-        self.level = level
-        self.parent_id = parent_id
-        self.path = path
-        self.children = []
-        
-  
-    def add_child(self, child):  
-        self.children.append(child)  
+    def __init__(self, id, title, level, parent_id, path, name, menu_type, ancestors, component, hideMenu, sort, children=None):
+        super().__init__()
+        self['id'] = id
+        self['title'] = title
+        self['level'] = level
+        self['parent_id'] = parent_id
+        self['path'] = path
+        self['name'] = name
+        self['menu_type'] = menu_type
+        self['ancestors'] = ancestors
+        self['component'] = component
+        self['hideMenu'] = hideMenu
+        self['sort'] = sort
+        self['children'] = children or []
 
-    def __str__(self):  
-        return f"TreeNode(id={self.id}, title={self.title}, level={self.level}, parent_id={self.parent_id})" 
-    
+    def add_child(self, child):  
+        self['children'].append(child)  
+        
     def __json__(self):
        return {
-            "id": self.id,
-            "title": self.title,
-            "level": self.level,
-            "parentId": self.parent_id,
+            "id": self['id'],
+            "title": self['title'],
+            "level": self['level'],
+            "parentId": self['parent_id'],
+            'path': self['path'],
+            'name': self['name'],
+            'menu_type': self['menu_type'],
+            'ancestors': self['ancestors'],
+            'component': self['component'],
+            'hideMenu': self['hideMenu'],
+            'sort': self['sort'],
             # 列表推导式，遍历子节点，递归调用__json__方法
-            "children": [child.__json__() for child in self.children]
+            "children": [child.__json__() for child in self['children']]
         }
     
 class TreeDataExcelReader:
@@ -94,27 +83,35 @@ class TreeDataExcelReader:
         for row in sheet.iter_rows(min_row=excel_config_definitions['data_row'], values_only=True):
             level = 0
             name = ''
-            node = TreeNode(None, None, None, None, None)
+            node = TreeNode(None, None, None, None, None, None, None, None, None, None, None)
             for colNum in range(excel_config_definitions['name_start'], excel_config_definitions['name_end']):
                 name = row[colNum]
                 if name :
-                    node.id = excel_config_definitions['generate_start_id'] + self.row_num
-                    node.title = name
-                    node.level = level
+                    node['id'] = excel_config_definitions['generate_start_id'] + self.row_num
+                    node['title'] = name
+                    node['level'] = level + 1
                     if level > 0:
                         parent_node = self.parent_node_list[level-1]
                         if parent_node:
                             parent_node.add_child(node)
-                            node.parent_id = parent_node.id
+                            node['parent_id'] = parent_node['id']
+                            # 菜单祖辈路径字段
+                            node['ancestors'] = f'{parent_node["ancestors"]},{parent_node["id"]}'
                     else:
+                        node['ancestors'] = '0'
+                        node['parent_id'] = '0'
                         self.root_node_list.append(node)
                     self.parent_node_list[level] = node
                     break
                 else:
                     level = level +1
-            for colNum in range(excel_config_definitions['extension_start'], excel_config_definitions['extension_end']):
-                name = row[colNum]
-            if node.title:
+            # 菜单属性字段
+            col_mapping = excel_config_definitions['col_mapping']
+            for colName, colNum in col_mapping.items():
+                if colName:
+                    node[colName] = row[colNum]
+            
+            if node['title']:
                 self.node_list.append(node)
                 self.logger.info(node)
             self.row_num = self.row_num + 1
@@ -125,6 +122,9 @@ class TreeDataExcelReader:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     excelReader = TreeDataExcelReader(logging)
-    excelReader.buildTreeDataFromExcel(excel_config_definitions)
+    with open('config.yaml', 'r') as file:
+        config = yaml.safe_load(file)
+    excel_config = config['excel_config']
+    excelReader.buildTreeDataFromExcel(excel_config)
     print(json.dumps([child.__json__() for child in excelReader.root_node_list], ensure_ascii=False, indent=4))
     print(excelReader.row_num)

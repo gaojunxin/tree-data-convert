@@ -37,6 +37,14 @@ pnpm install
 
 pnpm dev
 
+
+
+```
+
+导入菜单到人大进仓数据库
+```
+poetry run python tdc.py
+
 ```
 
 ## 目前进度
