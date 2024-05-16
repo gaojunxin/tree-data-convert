@@ -87,9 +87,9 @@ class TreeDataExcelReader:
             node = TreeNode(None, None, None, None, None, None, None, None, None, None, None)
             for colNum in range(excel_config_definitions['name_start'], excel_config_definitions['name_end']):
                 name = row[colNum]
-                if name :
+                if name is not None and name.strip() != '' :
                     node['id'] = excel_config_definitions['generate_start_id'] + self.row_num
-                    node['title'] = name
+                    node['title'] = name.strip()
                     node['level'] = level + 1
                     if level > 0:
                         parent_node = self.parent_node_list[level-1]
