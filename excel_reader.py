@@ -112,8 +112,8 @@ class TreeDataExcelReader:
                     node[colName] = row[colNum]
             if node['path'] is None:
                 node['path'] = node['id']
-            if menu_type is None or menu_type == "":
-                menu_type = "M"
+            if node['menu_type'] is None or node['menu_type'] == "":
+                node['menu_type'] = "M"
             if node['title']:
                 self.node_list.append(node)
                 self.logger.info(node)
