@@ -100,7 +100,6 @@ class TreeDataExcelReader:
                     else:
                         node['ancestors'] = '0'
                         node['parent_id'] = '0'
-                        node['path'] = "/"+node['id']
                         self.root_node_list.append(node)
                     self.parent_node_list[level] = node
                     break
