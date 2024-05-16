@@ -32,7 +32,7 @@ def importDataToKingbaseDB(dbconfig, schema_name, table_name, menu_list):
     update_by,update_time,is_common,is_default,del_flag,module_id,tenant_id) 
     VALUES
     (%(id)s,%(parent_id)s,%(name)s,%(title)s,%(menu_type)s,%(level)s,%(ancestors)s,%(path)s,NULL,%(component)s,NULL,NULL,'N','Y','N','N','0','0',%(hideMenu)s,'0','0','0',5,NULL,'',NULL,%(sort)s,'0',
-    '',NULL,'2023-11-15 14:20:04',NULL,NULL,'0','Y',0,1,0);
+    '',NULL,'2023-11-15 14:20:04',NULL,NULL,'1','Y',0,1,0);
 
     '''
 
