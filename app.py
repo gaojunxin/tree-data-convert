@@ -56,7 +56,7 @@ def run_script_route():
     # 在新线程中执行脚本
     # threading.Thread(target=run_script).start()
 
-    with open('config.yaml', 'r') as file:
+    with open('config.yaml', 'r', encoding='utf-8') as file:
         config = yaml.safe_load(file)
     excel_config = config['excel_config']
     excelReader = TreeDataExcelReader(logger)

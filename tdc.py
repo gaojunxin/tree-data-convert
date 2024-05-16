@@ -55,7 +55,7 @@ def importDataToKingbaseDB(dbconfig, schema_name, table_name, menu_list):
 
 if __name__ == '__main__':
 
-    with open('config.yaml', 'r') as file:
+    with open('config.yaml', 'r', encoding='utf-8') as file:
         config = yaml.safe_load(file)
     excel_config = config['excel_config']
     dbconfig = config['database']
