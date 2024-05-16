@@ -110,7 +110,8 @@ class TreeDataExcelReader:
             for colName, colNum in col_mapping.items():
                 if colName:
                     node[colName] = row[colNum]
-            
+            if node['path'] is None:
+                node['path'] = node['id']
             if node['title']:
                 self.node_list.append(node)
                 self.logger.info(node)
