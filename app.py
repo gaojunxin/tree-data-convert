@@ -3,12 +3,12 @@ import logging
 import os
 from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO, emit
+from menu_data_processor import MenuDataProcessor
 from werkzeug.utils import secure_filename
 import subprocess
 import threading
 import logging
 from flask_cors import CORS
-from excel_reader import TreeDataExcelReader
 import yaml
 
 app = Flask(__name__)
@@ -59,9 +59,10 @@ def run_script_route():
     with open('config.yaml', 'r', encoding='utf-8') as file:
         config = yaml.safe_load(file)
     excel_config = config['excel_config']
-    excelReader = TreeDataExcelReader(logger)
-    excelReader.buildTreeDataFromExcel(excel_config)
-    result = json.dumps([child.__json__() for child in excelReader.root_node_list], ensure_ascii=False, indent=4)
+    database = config['database']
+    menuDataProcessor = MenuDataProcessor(logger, excel_config, database)
+    menuDataProcessor.load_data_from_excel(excel_config)
+    result = json.dumps(menuDataProcessor.tree.to_dict(with_data=True), ensure_ascii=False, indent=4)
     return result
 
 @app.route('/')

@@ -1,62 +1,19 @@
-#!/usr/bin/python
-# -*- coding: UTF-8 -*-
-import os
 import json
-
-from openpyxl import load_workbook
 import logging
+import psycopg2
 import yaml
-import uuid
+from openpyxl import load_workbook
 
-class TreeNode(dict):  
-    """
-        初始化一个树节点对象实例。
+from tree_node import TreeNode
 
-        参数:
-        id: 节点的唯一标识符。
-        title: 节点的标题。
-        level: 节点在树中的层级。
-        parent_id: 父节点的标识符。
-        path: 节点在树中的路径。
 
-        属性:
-        children: 一个空列表，用于存储该节点的子节点。
-    """
-    def __init__(self, id, title, level, parent_id, path, name, menu_type, ancestors, component, hideMenu, sort, children=None):
-        super().__init__()
-        self['id'] = id
-        self['title'] = title
-        self['level'] = level
-        self['parent_id'] = parent_id
-        self['path'] = path
-        self['name'] = name
-        self['menu_type'] = menu_type
-        self['ancestors'] = ancestors
-        self['component'] = component
-        self['hideMenu'] = hideMenu
-        self['sort'] = sort
-        self['children'] = children or []
 
-    def add_child(self, child):  
-        self['children'].append(child)  
-        
-    def __json__(self):
-       return {
-            "id": self['id'],
-            "title": self['title'],
-            "level": self['level'],
-            "parentId": self['parent_id'],
-            'path': self['path'],
-            'name': self['name'],
-            'menu_type': self['menu_type'],
-            'ancestors': self['ancestors'],
-            'component': self['component'],
-            'hideMenu': self['hideMenu'],
-            'sort': self['sort'],
-            # 列表推导式，遍历子节点，递归调用__json__方法
-            "children": [child.__json__() for child in self['children']]
-        }
-    
+# 创建一个日志记录器实例
+logger = logging.getLogger(__name__)
+# 根据需要设置日志级别
+logger.setLevel(logging.DEBUG)  
+
+
 class TreeDataExcelReader:
     """
        树形数据结构读取器
@@ -74,7 +31,7 @@ class TreeDataExcelReader:
     # 根据excel中数据构建树结构
     def buildTreeDataFromExcel(self, excel_config_definitions):
         workbook = load_workbook(excel_config_definitions['excel_file_path'])
-        sheet_name = "菜单结构"
+        sheet_name = excel_config_definitions['sheet_name']
         # 查看sheet页清单
         # workbook.sheet_names()
         # print("sheets：" + str(workBook.sheet_names()))
@@ -123,14 +80,49 @@ class TreeDataExcelReader:
             self.row_num = self.row_num + 1
         
 
+# 导入数据到 Kingbase 数据库
+def importDataToKingbaseDB(dbconfig, table_name, menu_list):
+    schema_name = dbconfig['schema_name']
+    # 插入语句
+    sql = f'''
+    INSERT INTO "{schema_name}"."{table_name}" (id,parent_id,name,title,menu_type, delevel, ancestors,"path",frame_src,component,
+    param_path,transition_name,ignore_route,is_cache,is_affix,is_disabled,frame_type,hide_tab,hide_menu,hide_breadcrumb,
+    hide_children,hide_path_for_children,dynamic_level,real_path,perms,icon,sort,status,remark,create_by,create_time,
+    update_by,update_time,is_common,is_default,del_flag,module_id,tenant_id) 
+    VALUES
+    (%(id)s,%(parent_id)s,%(name)s,%(title)s,%(menu_type)s,%(level)s,%(ancestors)s,%(path)s,NULL,%(component)s,NULL,NULL,'N','Y','N','N','0','0',%(hideMenu)s,'0','0','0',5,NULL,'',NULL,%(sort)s,'0',
+    '',NULL,'2023-11-15 14:20:04',NULL,NULL,'1','Y',0,1,0);
+
+    '''
+
+    with psycopg2.connect(
+        host=dbconfig['host'],
+        port=dbconfig['port'],
+        user=dbconfig['user'],
+        password=dbconfig['password'],
+        database=dbconfig['dbname'],
+    ) as conn:
+        with conn.cursor() as cursor:
+            # 使用executemany()方法，传入SQL和字典列表
+            logging.info(menu_list)
+            try:
+                cursor.executemany(sql, menu_list)
+                conn.commit()
+            except Exception as e:
+                logging.error("执行executemany失败", exc_info=True)
 
 
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    excelReader = TreeDataExcelReader(logging)
-    with open('config.yaml', 'r') as file:
+if __name__ == '__main__':
+
+    with open('config.yaml', 'r', encoding='utf-8') as file:
         config = yaml.safe_load(file)
     excel_config = config['excel_config']
+    dbconfig = config['database']
+  
+    excelReader = TreeDataExcelReader(logger)
+
+    # 读取excel文件
     excelReader.buildTreeDataFromExcel(excel_config)
-    print(json.dumps([child.__json__() for child in excelReader.root_node_list], ensure_ascii=False, indent=4))
-    print(excelReader.row_num)
+
+    # 插入到数据库
+    importDataToKingbaseDB(dbconfig, excel_config['table_name'], excelReader.node_list)

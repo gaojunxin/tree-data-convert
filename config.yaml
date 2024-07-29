@@ -1,10 +1,11 @@
 # 数据库配置
 database:
-  host: 192.168.0.2
+  host: 192.168.100.12
   port: 54321
-  user: admin
+  user: system
   password: 123456
   dbname: develop
+  schema_name: xy_cloud
 
 # 日志配置
 logging:
@@ -22,14 +23,12 @@ app_settings:
 # Excel配置定义文件
 # 用于指示如何读取和解析Excel数据，特别是针对"菜单结构"的处理
 excel_config:
-  # 模式名
-  schema_name : xy_cloud1 
   # 菜单表名
-  table_name : sys_menu 
+  table_name : sys_menu_temp
   # Excel文件的完整路径
-  excel_file_path: demo.xlsx
+  excel_file_path: /home/gaojunxin/SynologyDrive/Document/工作文档/中海油装备公司项目/菜单/菜单信息收集-增效管理(管理数字化)-20240729.xlsx
   # 需要读取的工作表名称
-  sheet_name: 菜单结构
+  sheet_name: "菜单结构(6.5 更新)"
   # Excel中列标题所在的行号
   name_row: 1
   # 数据记录开始的行号
@@ -37,24 +36,24 @@ excel_config:
   # 列标题开始的列索引
   name_start: 0
   # 列标题结束的列索引
-  name_end: 7
+  name_end: 6
   # 自动生成ID的起始值
-  generate_start_id: 8000
+  generate_start_id: 7000
   # 列数据与字段名的映射关系
   col_mapping:
     # 导航路径
-    path: 8
+    path: 6
     # 组件名称或路径
-    component: 9
+    component: 7
     # 菜单项名称
-    name: 10
+    name: 8
     # 参数路径（似乎与path重复，需确认用途）
-    param_path: 8
+    # param_path: 9
     # 是否隐藏菜单项
-    hideMenu: 11
+    hide_menu: 9
     # 权限标识
-    perms: 12
+    perms: 10
     # 菜单类型
-    menu_type: 13
+    menu_type: 11
     # 排序顺序
-    # sort: 10
+    sort: 12

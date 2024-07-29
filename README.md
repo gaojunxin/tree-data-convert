@@ -43,7 +43,10 @@ pnpm dev
 
 导入菜单到人大进仓数据库
 ```
-poetry run python tdc.py
+poetry run python main.py
+
+# 代码中可以通过更新id号来实现插入任意节点
+menuDataProcessor.update_parent(menuDataProcessor.tree, 7000, 8000)
 
 ```
 
